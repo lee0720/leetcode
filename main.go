@@ -6,12 +6,42 @@ import (
 	"strconv"
 )
 
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
 var drow = []int{-1, 1, 0, 0, -1, 1, -1, 1}
 var dcol = []int{0, 0, -1, 1, -1, 1, 1, -1}
 
 func main() {
-
-	fmt.Println(trulyMostPopular([]string{"a(10)", "c(13)"}, []string{"(a,b)", "(c,d)", "(b,c)"}))
+	fmt.Println(findDuplicate([]int{1, 3, 4, 2, 2}))
+}
+func findDuplicate(nums []int) int {
+	slow := 0
+	fast := 0
+	for {
+		slow = nums[slow]
+		fast = nums[nums[fast]]
+		if slow == fast {
+			break
+		}
+	}
+	ptr := 0
+	for {
+		ptr = nums[ptr]
+		slow = nums[slow]
+		if ptr == slow {
+			break
+		}
+	}
+	return ptr
 }
 
 func pondSizes(land [][]int) (res []int) {
@@ -81,12 +111,6 @@ func dfs(row, col int, maps *[][]bool, land [][]int, count *int) {
 //           11  13  4
 //          /  \    / \
 //         7    2  5   1
-
-type TreeNode struct {
-	Val   int
-	Left  *TreeNode
-	Right *TreeNode
-}
 
 func pathSum(root *TreeNode, sum int) int {
 	if root == nil {
