@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"math"
 	"sort"
 	"strconv"
 )
@@ -23,34 +25,31 @@ func main() {
 
 }
 
-func minPathSum(grid [][]int) int {
-
-	rows, cols := len(grid), len(grid[0])
+func minimumTotal(triangle [][]int) int {
+	rows := len(triangle)
 	dp := make([][]int, rows)
-
 	for i := range dp {
-		dp[i] = make([]int, cols)
+		dp[i] = make([]int, rows)
 	}
-
 	min := func(a, b int) int {
 		if a > b {
 			return b
 		}
 		return a
 	}
-	dp[0][0] = grid[0][0]
+	dp[0][0] = triangle[0][0]
 	for i := 1; i < rows; i++ {
-		dp[i][0] = dp[i-1][0] + grid[i][0]
-	}
-	for i := 1; i < cols; i++ {
-		dp[0][i] = dp[0][i-1] + grid[0][i]
-	}
-	for i := 1; i < rows; i++ {
-		for j := 1; j < cols; j++ {
-			dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i][j]
+		dp[i][0] = dp[i-1][0] + triangle[i][0]
+		for j := 1; j < i; j++ {
+			dp[i][j] = min(dp[i-1][j-1], dp[i-1][j]) + triangle[i][j]
 		}
+		dp[i][i] = dp[i-1][i-1] + triangle[i][i]
 	}
-	return dp[rows-1][cols-1]
+	ans := math.MaxInt32
+	for i := 0; i < rows; i++ {
+		ans = min(ans, dp[rows-1][i])
+	}
+	return ans
 }
 
 func findDuplicate(nums []int) int {
