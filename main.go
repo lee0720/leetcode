@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"sort"
 	"strconv"
 )
@@ -21,8 +20,39 @@ var drow = []int{-1, 1, 0, 0, -1, 1, -1, 1}
 var dcol = []int{0, 0, -1, 1, -1, 1, 1, -1}
 
 func main() {
-	fmt.Println(findDuplicate([]int{1, 3, 4, 2, 2}))
+
 }
+
+func minPathSum(grid [][]int) int {
+
+	rows, cols := len(grid), len(grid[0])
+	dp := make([][]int, rows)
+
+	for i := range dp {
+		dp[i] = make([]int, cols)
+	}
+
+	min := func(a, b int) int {
+		if a > b {
+			return b
+		}
+		return a
+	}
+	dp[0][0] = grid[0][0]
+	for i := 1; i < rows; i++ {
+		dp[i][0] = dp[i-1][0] + grid[i][0]
+	}
+	for i := 1; i < cols; i++ {
+		dp[0][i] = dp[0][i-1] + grid[0][i]
+	}
+	for i := 1; i < rows; i++ {
+		for j := 1; j < cols; j++ {
+			dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i][j]
+		}
+	}
+	return dp[rows-1][cols-1]
+}
+
 func findDuplicate(nums []int) int {
 	slow := 0
 	fast := 0
