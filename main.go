@@ -3,15 +3,100 @@ package main
 import (
 	"fmt"
 	"sort"
-	"strconv"
 )
 
 var drow = []int{-1, 1, 0, 0, -1, 1, -1, 1}
 var dcol = []int{0, 0, -1, 1, -1, 1, 1, -1}
 
 func main() {
+	merge([]int{1, 3, 4, 0, 0, 0}, 3, []int{2, 6, 7}, 3)
+}
 
-	fmt.Println(trulyMostPopular([]string{"a(10)", "c(13)"}, []string{"(a,b)", "(c,d)", "(b,c)"}))
+func merge(nums1 []int, m int, nums2 []int, n int) {
+	p1, p2 := m-1, n-1
+	cur := m + n - 1
+	tail := 0
+	for p1 >= 0 || p2 >= 0 {
+		if p1 == -1 {
+			tail = nums2[p2]
+			p2--
+		} else if p2 == -1 {
+			tail = nums1[p1]
+			p1--
+		} else if nums1[p1] >= nums2[p2] {
+			tail = nums1[p1]
+			p1--
+		} else if nums1[p1] < nums2[p2] {
+			tail = nums2[p2]
+			p2--
+		}
+
+		nums1[cur] = tail
+		cur --
+	}
+	fmt.Println(nums1)
+}
+
+func inorderSuccessor(root *TreeNode, p *TreeNode) (t *TreeNode) {
+	var (
+		flag bool
+		ans  *TreeNode
+		f    func(*TreeNode)
+	)
+	f = func(r *TreeNode) {
+		if r != nil && ans == nil {
+			f(r.Left)
+			if r == p {
+				flag = true
+			} else if flag {
+				ans, flag = r, false
+			}
+			f(r.Right)
+		}
+	}
+	f(root)
+	return ans
+}
+
+func inorderSuccessorV1(root *TreeNode, p *TreeNode) (t *TreeNode) {
+	var res *[]int
+	var inorder func(root *TreeNode, r *[]int)
+	var inorder1 func(root *TreeNode, target int, t *TreeNode)
+	inorder = func(root *TreeNode, r *[]int) {
+		if root == nil {
+			return
+		}
+		inorder(root.Left, r)
+		*r = append(*r, root.Val)
+		inorder(root.Right, r)
+	}
+
+	inorder(root, res)
+	var val int
+	for i := range *res {
+		if (*res)[i] == p.Val {
+			if i+1 <= len(*res) {
+				val = (*res)[i+1]
+			} else {
+				return nil
+			}
+		}
+	}
+
+	inorder1 = func(root *TreeNode, target int, t *TreeNode) {
+		if root == nil {
+			return
+		}
+		if root.Val == target {
+			t = root
+		}
+		inorder1(root.Left, target, t)
+		inorder1(root.Right, target, t)
+
+	}
+	inorder1(root, val, t)
+	return t
+
 }
 
 func pondSizes(land [][]int) (res []int) {
@@ -117,103 +202,4 @@ func preOrder(root *TreeNode, cur, sum int, count *int) {
 	}
 	preOrder(root.Left, cur, sum, count)
 	preOrder(root.Right, cur, sum, count)
-}
-
-func trulyMostPopular(names []string, synonyms []string) []string {
-	freq := map[string]int{}
-	uf_set := map[string]string{}
-	find := func(name string) string {
-		if _, exits := uf_set[name]; !exits {
-			return ""
-		}
-		for uf_set[name] != name {
-			name = uf_set[name]
-		}
-		return name
-	}
-
-	union := func(name1, name2 string) {
-		set1, set2 := find(name1), find(name2)
-		if set1 != "" && set2 != "" && set1 != set2 {
-			if set1 < set2 {
-				uf_set[set2] = set1
-				freq[set1] += freq[set2]
-				delete(freq, set2)
-			} else {
-				uf_set[set1] = set2
-				freq[set2] += freq[set1]
-				delete(freq, set1)
-			}
-		}
-	}
-
-	for _, name_freq := range names {
-		end := 0
-		for name_freq[end] != '(' {
-			end++
-		}
-		name := name_freq[:end]
-		uf_set[name] = name
-		freq[name], _ = strconv.Atoi(name_freq[end+1 : len(name_freq)-1])
-	}
-
-	for _, syn := range synonyms {
-		end := 0
-		for syn[end] != ',' {
-			end++
-		}
-		name1 := syn[1:end]
-		name2 := syn[end+1 : len(syn)-1]
-		if _, exits := uf_set[name1]; !exits {
-			uf_set[name1] = name1
-		}
-		if _, exits := uf_set[name2]; !exits {
-			uf_set[name2] = name2
-		}
-		union(name1, name2)
-
-	}
-
-	res := []string{}
-	for name := range freq {
-		if freq[name] != 0 {
-			res = append(res, name+"("+strconv.Itoa(freq[name])+")")
-		}
-	}
-	return res
-}
-
-func findCircleNum(isConnected [][]int) (ans int) {
-	n := len(isConnected)
-	parent := make([]int, n)
-	for i := range parent {
-		parent[i] = i
-	}
-	var find func(x int) int
-	find = func(x int) int {
-		if x != parent[x] {
-			parent[x] = find(parent[x])
-		}
-		return parent[x]
-	}
-	var union func(x, y int)
-	union = func(x, y int) {
-		parent[find(x)] = find(y)
-	}
-
-	for i := range isConnected {
-		for j := range isConnected[i] {
-			if isConnected[i][j] == 1 {
-				union(i, j)
-			}
-		}
-	}
-
-	for i := range parent {
-		if i == parent[i] {
-			ans++
-		}
-	}
-	return ans
-
 }
