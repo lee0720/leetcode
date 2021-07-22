@@ -5,98 +5,42 @@ import (
 	"sort"
 )
 
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
 var drow = []int{-1, 1, 0, 0, -1, 1, -1, 1}
 var dcol = []int{0, 0, -1, 1, -1, 1, 1, -1}
 
 func main() {
-	merge([]int{1, 3, 4, 0, 0, 0}, 3, []int{2, 6, 7}, 3)
+	fmt.Println(findDuplicate([]int{1, 3, 4, 2, 2}))
 }
-
-func merge(nums1 []int, m int, nums2 []int, n int) {
-	p1, p2 := m-1, n-1
-	cur := m + n - 1
-	tail := 0
-	for p1 >= 0 || p2 >= 0 {
-		if p1 == -1 {
-			tail = nums2[p2]
-			p2--
-		} else if p2 == -1 {
-			tail = nums1[p1]
-			p1--
-		} else if nums1[p1] >= nums2[p2] {
-			tail = nums1[p1]
-			p1--
-		} else if nums1[p1] < nums2[p2] {
-			tail = nums2[p2]
-			p2--
-		}
-
-		nums1[cur] = tail
-		cur --
-	}
-	fmt.Println(nums1)
-}
-
-func inorderSuccessor(root *TreeNode, p *TreeNode) (t *TreeNode) {
-	var (
-		flag bool
-		ans  *TreeNode
-		f    func(*TreeNode)
-	)
-	f = func(r *TreeNode) {
-		if r != nil && ans == nil {
-			f(r.Left)
-			if r == p {
-				flag = true
-			} else if flag {
-				ans, flag = r, false
-			}
-			f(r.Right)
+func findDuplicate(nums []int) int {
+	slow := 0
+	fast := 0
+	for {
+		slow = nums[slow]
+		fast = nums[nums[fast]]
+		if slow == fast {
+			break
 		}
 	}
-	f(root)
-	return ans
-}
-
-func inorderSuccessorV1(root *TreeNode, p *TreeNode) (t *TreeNode) {
-	var res *[]int
-	var inorder func(root *TreeNode, r *[]int)
-	var inorder1 func(root *TreeNode, target int, t *TreeNode)
-	inorder = func(root *TreeNode, r *[]int) {
-		if root == nil {
-			return
-		}
-		inorder(root.Left, r)
-		*r = append(*r, root.Val)
-		inorder(root.Right, r)
-	}
-
-	inorder(root, res)
-	var val int
-	for i := range *res {
-		if (*res)[i] == p.Val {
-			if i+1 <= len(*res) {
-				val = (*res)[i+1]
-			} else {
-				return nil
-			}
+	ptr := 0
+	for {
+		ptr = nums[ptr]
+		slow = nums[slow]
+		if ptr == slow {
+			break
 		}
 	}
-
-	inorder1 = func(root *TreeNode, target int, t *TreeNode) {
-		if root == nil {
-			return
-		}
-		if root.Val == target {
-			t = root
-		}
-		inorder1(root.Left, target, t)
-		inorder1(root.Right, target, t)
-
-	}
-	inorder1(root, val, t)
-	return t
-
+	return ptr
 }
 
 func pondSizes(land [][]int) (res []int) {
@@ -166,12 +110,6 @@ func dfs(row, col int, maps *[][]bool, land [][]int, count *int) {
 //           11  13  4
 //          /  \    / \
 //         7    2  5   1
-
-type TreeNode struct {
-	Val   int
-	Left  *TreeNode
-	Right *TreeNode
-}
 
 func pathSum(root *TreeNode, sum int) int {
 	if root == nil {
