@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"sort"
 )
 
@@ -20,7 +19,38 @@ var drow = []int{-1, 1, 0, 0, -1, 1, -1, 1}
 var dcol = []int{0, 0, -1, 1, -1, 1, 1, -1}
 
 func main() {
-	fmt.Println(findDuplicate([]int{1, 3, 4, 2, 2}))
+	// fmt.Println(sortA`rray([]int{3, 6, 1, 9, 2}))
+
+}
+
+func sortArray(nums []int) []int {
+	return quickArray(nums, 0, len(nums)-1)
+}
+
+func quickArray(nums []int, left, right int) []int {
+	if len(nums) == 1 {
+		return nums
+	}
+	partition := func(arr []int, left, right int) int {
+		pivot := arr[left]
+		j := left
+		for i := left + 1; i <= right; i++ {
+			if arr[i] <= pivot {
+				j++
+				arr[i], arr[j] = arr[j], arr[i]
+			}
+		}
+		arr[left], arr[j] = arr[j], arr[left]
+
+		return j
+	}
+
+	if left < right {
+		index := partition(nums, left, right)
+		quickArray(nums, left, index-1)
+		quickArray(nums, index+1, right)
+	}
+	return nums
 }
 func findDuplicate(nums []int) int {
 	slow := 0
