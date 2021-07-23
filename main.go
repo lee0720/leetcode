@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"math"
 	"sort"
-	"strconv"
 )
 
 type TreeNode struct {
@@ -22,7 +20,38 @@ var drow = []int{-1, 1, 0, 0, -1, 1, -1, 1}
 var dcol = []int{0, 0, -1, 1, -1, 1, 1, -1}
 
 func main() {
+	// fmt.Println(sortA`rray([]int{3, 6, 1, 9, 2}))
 
+}
+
+func sortArray(nums []int) []int {
+	return quickArray(nums, 0, len(nums)-1)
+}
+
+func quickArray(nums []int, left, right int) []int {
+	if len(nums) == 1 {
+		return nums
+	}
+	partition := func(arr []int, left, right int) int {
+		pivot := arr[left]
+		j := left
+		for i := left + 1; i <= right; i++ {
+			if arr[i] <= pivot {
+				j++
+				arr[i], arr[j] = arr[j], arr[i]
+			}
+		}
+		arr[left], arr[j] = arr[j], arr[left]
+
+		return j
+	}
+
+	if left < right {
+		index := partition(nums, left, right)
+		quickArray(nums, left, index-1)
+		quickArray(nums, index+1, right)
+	}
+	return nums
 }
 
 func minimumTotal(triangle [][]int) int {
@@ -170,103 +199,4 @@ func preOrder(root *TreeNode, cur, sum int, count *int) {
 	}
 	preOrder(root.Left, cur, sum, count)
 	preOrder(root.Right, cur, sum, count)
-}
-
-func trulyMostPopular(names []string, synonyms []string) []string {
-	freq := map[string]int{}
-	uf_set := map[string]string{}
-	find := func(name string) string {
-		if _, exits := uf_set[name]; !exits {
-			return ""
-		}
-		for uf_set[name] != name {
-			name = uf_set[name]
-		}
-		return name
-	}
-
-	union := func(name1, name2 string) {
-		set1, set2 := find(name1), find(name2)
-		if set1 != "" && set2 != "" && set1 != set2 {
-			if set1 < set2 {
-				uf_set[set2] = set1
-				freq[set1] += freq[set2]
-				delete(freq, set2)
-			} else {
-				uf_set[set1] = set2
-				freq[set2] += freq[set1]
-				delete(freq, set1)
-			}
-		}
-	}
-
-	for _, name_freq := range names {
-		end := 0
-		for name_freq[end] != '(' {
-			end++
-		}
-		name := name_freq[:end]
-		uf_set[name] = name
-		freq[name], _ = strconv.Atoi(name_freq[end+1 : len(name_freq)-1])
-	}
-
-	for _, syn := range synonyms {
-		end := 0
-		for syn[end] != ',' {
-			end++
-		}
-		name1 := syn[1:end]
-		name2 := syn[end+1 : len(syn)-1]
-		if _, exits := uf_set[name1]; !exits {
-			uf_set[name1] = name1
-		}
-		if _, exits := uf_set[name2]; !exits {
-			uf_set[name2] = name2
-		}
-		union(name1, name2)
-
-	}
-
-	res := []string{}
-	for name := range freq {
-		if freq[name] != 0 {
-			res = append(res, name+"("+strconv.Itoa(freq[name])+")")
-		}
-	}
-	return res
-}
-
-func findCircleNum(isConnected [][]int) (ans int) {
-	n := len(isConnected)
-	parent := make([]int, n)
-	for i := range parent {
-		parent[i] = i
-	}
-	var find func(x int) int
-	find = func(x int) int {
-		if x != parent[x] {
-			parent[x] = find(parent[x])
-		}
-		return parent[x]
-	}
-	var union func(x, y int)
-	union = func(x, y int) {
-		parent[find(x)] = find(y)
-	}
-
-	for i := range isConnected {
-		for j := range isConnected[i] {
-			if isConnected[i][j] == 1 {
-				union(i, j)
-			}
-		}
-	}
-
-	for i := range parent {
-		if i == parent[i] {
-			ans++
-		}
-	}
-	return ans
-
 }
