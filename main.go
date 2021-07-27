@@ -1,7 +1,6 @@
 package main
 
 import (
-	"math"
 	"sort"
 )
 
@@ -20,65 +19,7 @@ var drow = []int{-1, 1, 0, 0, -1, 1, -1, 1}
 var dcol = []int{0, 0, -1, 1, -1, 1, 1, -1}
 
 func main() {
-	// fmt.Println(sortA`rray([]int{3, 6, 1, 9, 2}))
 
-}
-
-func sortArray(nums []int) []int {
-	return quickArray(nums, 0, len(nums)-1)
-}
-
-func quickArray(nums []int, left, right int) []int {
-	if len(nums) == 1 {
-		return nums
-	}
-	partition := func(arr []int, left, right int) int {
-		pivot := arr[left]
-		j := left
-		for i := left + 1; i <= right; i++ {
-			if arr[i] <= pivot {
-				j++
-				arr[i], arr[j] = arr[j], arr[i]
-			}
-		}
-		arr[left], arr[j] = arr[j], arr[left]
-
-		return j
-	}
-
-	if left < right {
-		index := partition(nums, left, right)
-		quickArray(nums, left, index-1)
-		quickArray(nums, index+1, right)
-	}
-	return nums
-}
-
-func minimumTotal(triangle [][]int) int {
-	rows := len(triangle)
-	dp := make([][]int, rows)
-	for i := range dp {
-		dp[i] = make([]int, rows)
-	}
-	min := func(a, b int) int {
-		if a > b {
-			return b
-		}
-		return a
-	}
-	dp[0][0] = triangle[0][0]
-	for i := 1; i < rows; i++ {
-		dp[i][0] = dp[i-1][0] + triangle[i][0]
-		for j := 1; j < i; j++ {
-			dp[i][j] = min(dp[i-1][j-1], dp[i-1][j]) + triangle[i][j]
-		}
-		dp[i][i] = dp[i-1][i-1] + triangle[i][i]
-	}
-	ans := math.MaxInt32
-	for i := 0; i < rows; i++ {
-		ans = min(ans, dp[rows-1][i])
-	}
-	return ans
 }
 
 func findDuplicate(nums []int) int {
